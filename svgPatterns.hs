@@ -27,13 +27,15 @@ rgbPalette n = take n $ cycle [(143, 227, 143),(15, 128, 15),(13, 181, 13)]
 -- Geração de retângulos em suas posições
 -------------------------------------------------------------------------------
 
-genRectsInLine :: Int -> [Rect]
-genRectsInLine n  = [((m*w, if m > 8 then 100 else 0 ), w, h) | m <- [0..fromIntegral (n-1)]]
-  where (w,h) = (100,100)
-
---genRectsInLine :: Int -> [Rect]
---genRectsInLine n  = [((m*w, 0.0), w, h) | m <- [0..fromIntegral (n-1)]]
+--genRectsInDiagonal :: Int -> [Rect]
+--genRectsInDiagonal n  = [((m*w, m*h ), w, h) | m <- [0..fromIntegral (n-1)]]
 --  where (w,h) = (100,100)
+line :: Float -> Float
+line x = if x > 8 then 100 else 0 
+
+genRectsInLine :: Int -> [Rect]
+genRectsInLine n  = [((m*w, p), w, h) | m <- [0..fromIntegral (n-1)], p <- [0,100..700]]
+  where (w,h) = (100,100)
 
 -------------------------------------------------------------------------------
 -- Strings SVG
@@ -63,6 +65,15 @@ svgStyle (r,g,b) = printf "fill:rgb(%d,%d,%d); mix-blend-mode: screen;" r g b
 svgElements :: (a -> String -> String) -> [a] -> [String] -> String
 svgElements func elements styles = concat $ zipWith func elements styles
 
+svgCreeperFace :: String
+svgCreeperFace = 
+  svgRect ((100,200),200,200) "fill:rgb(1,1,1)" ++
+  svgRect ((500,200),200,200) "fill:rgb(1,1,1)" ++
+  svgRect ((200,500),400,200) "fill:rgb(1,1,1)" ++
+  svgRect ((300,400),200,200) "fill:rgb(1,1,1)" ++
+  svgRect ((200,700),100,100) "fill:rgb(1,1,1)" ++
+  svgRect ((500,700),100,100) "fill:rgb(1,1,1)"
+  
 -------------------------------------------------------------------------------
 -- Função principal que gera arquivo com imagem SVG
 -------------------------------------------------------------------------------
@@ -70,11 +81,11 @@ svgElements func elements styles = concat $ zipWith func elements styles
 main :: IO ()
 main = do
   writeFile "figs.svg" $ svgstrs
-  where svgstrs = svgBegin w h ++ svgfigs ++ svgEnd
+  where svgstrs = svgBegin w h ++ svgfigs ++ svgCreeperFace ++ svgEnd
         svgfigs = svgElements svgRect rects (map svgStyle palette)
         rects = genRectsInLine nrects
         palette = rgbPalette nrects
-        nrects = 16
+        nrects = 64
         (w,h) = (800,800) -- width,height da imagem SVG
 
 

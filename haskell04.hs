@@ -23,5 +23,5 @@ genCircs :: Int -> (Int,Int) -> Int -> [(Int,Int,Int)]
 genCircs n (cx,cy) r = [(cx + r * x,cy,r) | x <- [0..n-1]]
 
 genReds :: Int -> [(Int,Int,Int)]
-genReds n = [(n + 10 * x, 0, 0) | x <- [0..n-1]]
+genReds n = [(x, 0, 0) | x <- take n $ cycle [1..255]]
 
